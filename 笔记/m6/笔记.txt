@@ -1,0 +1,22 @@
+1.进行数据请求时，必须保证数据的格式是服务器要求的格式（可通过控制台--network查看错误原因）
+eg：时间的格式
+JSON parse error: Can not deserialize value of type java.sql.Timestamp from String "2018/04/04": expected format "yyyy-MM-dd"
+
+m6 --->加format属性
+<DateTime name="csrq" title="出生日期" required readOnly={readFlag} format="yyyy-MM-dd"/>
+
+
+2.静态字典和动态字典
+静态是写死的数据，动态可以添加sql语句进行筛选之后的数据，params的写法不一样
+静态：params: { kind:'shcj_zzsx'}}----数据库提供的kind属性（table-DICTIONARY）
+动态：params: {
+	dictType: 'dynamic',
+        configId: "FJH_DICT",
+        zbid: "4028c29b6579540b0165795603270000",
+      }
+----数据库提供的configId属性（ID字段下的值）（zbid属性是paramnames字段下）
+（table-C_DYNAMIC_DICT）(在QUERYSQL里添加sql语句)
+
+3.如何使用icon
+<span className = 'm6-icon icon-xxx' />
+xxx----》Font Awesome的图标名   http://fontawesome.io/icons/

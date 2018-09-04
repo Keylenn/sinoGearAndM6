@@ -1,0 +1,100 @@
+export default class Re extends Basic {
+    constructor(props) {super(props);}
+
+    componentDidMount() {
+        let h = window.M6.getDocumentPort().height;
+        this.__onResizeLis = e => {
+            if(window.M6.getDocumentPort().height < h){
+                this.defRefs['tabBottom'] && (this.defRefs['tabBottom'].style.visibility = 'hidden');
+            }else{
+                this.defRefs['tabBottom'] && (this.defRefs['tabBottom'].style.visibility = 'visible');
+            }
+        };
+        window.addEventListener('onresize', this.__onResizeLis);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('onresize', this.__onResizeLis);
+        super.componentWillUnmount();
+    }
+
+    getActiveCls(key, url) {
+        if(this.currentUrl === url){
+            return 'm6-tab-i-active';
+        }else if(key === 'bottom' && url === window.M6.Router.RelateTabs[this.currentUrl]) {
+            return 'm6-tab-i-active';
+        }else return undefined;
+    }
+
+    getTabContent() {
+        const { tabs, customTab } = this.props;
+        let globalData = super.getData().global || {};
+        globalData.router = globalData.router || {};
+        let myTabContent = [];
+        if(tabs && Object.keys(tabs).length > 0){
+            this.currentUrl = window.location.hash;
+            this.currentUrl = this.currentUrl.indexOf('#') === 0 ? this.currentUrl.substring(1) : this.currentUrl;
+            for(let key in tabs){
+                if(tabs[key] && tabs[key].length > 0){
+                    let navLinks = [];
+                    tabs[key].forEach((tabItem, i) => {
+                        let _hint, _hintTop, _dot, _dotTop;
+                        if(globalData.router['#' + tabItem.url]){
+                            if(globalData.router['#' + tabItem.url].notifyCount){
+                                if(key === 'top')
+                                    _hintTop = (<span className="m6-tab-i-hint m6-an-fade-in" >{globalData.router['#' + tabItem.url].notifyCount}</span>);
+                                else
+                                    _hint = (<span className="m6-tab-i-hint m6-an-fade-in" >{globalData.router['#' + tabItem.url].notifyCount}</span>);
+                            }else if(globalData.router['#' + tabItem.url].notifyDot){
+                                if(key === 'top')
+                                    _dotTop = (<span className="m6-tab-i-red-dot m6-an-fade-in" />);
+                                else _dot = (<span className="m6-tab-i-red-dot m6-an-fade-in" />);
+                            }
+                        }
+                        navLinks.push(<div key={i} className="m6-tab-i" >
+                            <NavLink exact to={tabItem.url} replace className={this.getActiveCls(key, tabItem.url)} >
+                                {_hint ? <div>{_hint}</div> : undefined}
+                                {_dot ? <div>{_dot}</div> : undefined}
+                                {tabItem.icon ? <span className={'m6-icon m6-tab-i-icon ' + tabItem.icon} /> : undefined}
+                                {tabItem.src ? <span className="m6-tab-i-img" style={{backgroundImage: `url(${tabItem.src})`}} /> : undefined}
+                                <span className="m6-tab-i-label" >
+                                    {tabItem.title}
+                                    {_hintTop}
+                                    {_dotTop}
+                                </span>
+                            </NavLink>
+                        </div>);
+                    });
+                    if(key === 'top'){
+                        this.tabTop = (<div ref={this.regDef('tabTop')} key={key} className="m6-tab m6-tab-top" >{navLinks}</div>);
+                        if(!customTab){
+                            this.tabCls += ' m6-tab-top-blank';
+                            myTabContent.push(this.tabTop);
+                        }
+                    }
+                    if(key === 'bottom'){
+                        this.tabCls += ' m6-tab-bottom-blank';
+                        myTabContent.push(<div ref={this.regDef('tabBottom')} key={key} className="m6-tab m6-tab-bottom" >{navLinks}</div>);
+                    }
+                }
+            }
+        }
+        return myTabContent;
+    }
+-------------------------------------------------------------------------------------------
+let h = window.M6.getDocumentPort().height;
+
+/** 获取内容层大小 */
+window.M6.getDocumentPort = function () {
+    if(document.compatMode == "BackCompat")
+        return {
+            width: document.body.scrollWidth,
+            height: document.body.scrollHeight
+        };
+    else
+        return {
+            width: Math.max(document.documentElement.scrollWidth, document.documentElement.clientWidth),
+            height: Math.max(document.documentElement.scrollHeight, document.documentElement.clientHeight)
+        };
+};
+

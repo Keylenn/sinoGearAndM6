@@ -1,0 +1,40 @@
+m6项目开发：
+1.初始化项目
+2.重构项目结构（src--app--module--项目名称（空）+Environment.js + SysSetting.js）
+3.配置app.json
+4.配置index.js
+  1)配置工具类（新建utils文件夹，进行配置）
+  2)项目初始化（import，require）
+    eg：import React from 'react';
+	import M6Core from 'm6-core'; // eslint-disable-line
+	const {Ro, Re} = M6Core.Router;
+
+	require('../../Environment')();
+	require.context('./asset');
+	require('./utils/Init')(); // 初始化
+  3）页面的配置和渲染（Ro, Re）
+5.一个业务需求一个文件夹（view+[asset]+[ctrl]）
+
+	
+`````````````````````````````````````````````````````````````````````````````````````````
+
+
+React组件有以下几个重要组成部分：
+
+props
+state
+ref
+生命周期方法
+static方法
+React 元素树
+
+
+组件的内容编写顺序如下：
+1.static 开头的类属性，如 defaultProps、propTypes。
+2.构造函数，constructor。
+3.getter/setter（还不了解的同学可以暂时忽略）。
+4.组件生命周期。
+5._ 开头的私有方法。
+6.事件监听方法，handle*。
+7.render*开头的方法，有时候 render() 方法里面的内容会分开到不同函数里面进行，这些函数都以 render* 开头.
+8.render() 方法

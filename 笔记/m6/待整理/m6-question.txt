@@ -1,0 +1,247 @@
+
+`````````````````````````````````18.8.20```````````````````````````````````````````````
+
+???  Dictionary组件的使用
+providerEntity内的参数...(kind:怎么确定)
+
+
+`````````````````````````````````18.8.21```````````````````````````````````````````````
+
+1.页面控制器Controller应该作为页面组件super方法的参数，初始化后才能取得相关方法和数据
+eg：  
+  constructor(props){
+    super(props, Controller);
+  }
+
+2.页面定义的方法在初始化（constructor）时应该作为this.toBind方法的参数
+eg：
+  this.toBind('checkDateView', 'add');
+
+3.组件有ref属性，用来设置页面钩子对象，一般用来提供定位给Controller
+eg:表单数据校验
+ View: <Form name="personInfo" ref={this.regDef('qyxxForm')}> 定义regDef（'name'）
+ Controller: this.getContext().defRefs['qyxxForm'].validate(); 获取defRefs['name']
+
+??? validate()是钩子对象regDef特有的方法？还有哪些方法？
+
+???不填信息点击保存按钮不是一次行打印值为空？
+
+??? 表单组件数据的获取 不是set 可以直接通过组件name属性 get, 根组件需要带host={this}
+eg：
+   <Form name="personInfo" }>
+   this.getContext().getViewData().personInfo;
+
+4.页面组件绑定页面控制器内的方法
+eg：
+   <NavBtn right title="新增"  onClick={this.getController().add}/>
+
+??? 接口文档格式？？？
+
+
+
+`````````````````````````````````18.8.22```````````````````````````````````````````````
+1.Popup.xxx（...）
+--->context是上下文，可以'文字'/ ''？
+--->type有哪些？child什么意思？
+
+？？？删除最后一个人员信息时，无法自动刷新页面
+this.contr.simpleQuery(true); 
+
+2.headers: {
+     'Accept': 'application/json',  //请求头，代表客户端希望接受的数据类型
+     'Access-Control-Allow-Origin': '*', //通过CORS实现跨域请求
+     'Content-Type': 'application/json; charset=UTF-8', //实体头，代表客户端/服务器发送的实体数据的数据类型
+     'X-Requested-With': 'XMLHttpRequest',//用来判断一个请求是传统的HTTP请求，还是Ajax请求
+     'X-CSRF-TOKEN': window.M6APPUSER().csrfToken,//防止CSRF，登录成功后服务器分配一个csrfToken标识，之后的每一次操作，都需要客户端向服务器提供这个Token，以验证登录状态
+  }
+
+3.搜索条的value值可通过向onSearch属性绑定的方法传参获得（value）
+
+4.跨页面获取数据
+this.go('/demo/popup', {systemId: '123456'}); // 携带参数模式跳转
+
+console.log(this.getBundle());// 获取路由跳转带来的参数集
+
+？？？如何动态获取List中部分ListItem的元素 改变样式
+数组作为参数，includes方法
+ 
+
+
+`````````````````````````````````18.8.23```````````````````````````````````````````````
+???onClick ={不能带参？}
+this.go('/aaa') <===> onClick={this.toAaa} toAaa(){this.go('/aaa')} this.toBind('toAaa')
+
+
+`````````````````````````````````18.8.6-17```````````````````````````````````````````````
+1.require('../../Environment')();  在m6环境下的动态类库依赖
+M6.BCFG，getBootConfig()
+
+------------------------------------------------------------------------------------
+2.Body vs body
+<fixed,left>属性？
+
+Body 是组件 可以嵌套在页面任何位置
+body是html标签？
+m6中html标签严格区分大小写？
+
+--->Div vs div
+
+
+set/getViewData怎么用？只能用于表单组件？
+set/getViewStyle怎么用？通过name属性？
+存储在 Redux - Store 中,方便页面共享数据？
+
+setViewState(data = {stateData: {}, stateStyle: {}}, callback) {
+        super.setMirror({data: data});
+        this.setMyDataToRedux(super.getMyState().data, callback);
+    }
+
+    getViewData() {
+        return super.getMyState().data.stateData;
+    }
+    setViewData(data = {}, callback) {
+        let currentData = super.getMyState().data;
+        Object.assign(currentData.stateData, data);
+        this.setViewState(currentData, callback);
+    }
+
+    getViewStyle() {
+        return super.getMyState().data.stateStyle;
+    }
+    setViewStyle(viewStyle = {}, callback, refresh = true) {
+        Object.assign(this.getViewStyle(), viewStyle);
+        refresh && super.refresh(callback);
+    }
+
+
+------------------------------------------------------------------------------------
+
+3.Ro里面的tabTop（顶部标签组）、tabBottom（底部标签组）
+------------------------------------------------------------------------------------
+4.@M6Core.Connect
+------------------------------------------------------------------------------------
+5.this.toBind('signIn', 'vfCode');事件绑定方法
+this.setBundle(this.getUrl());设置跳转到指定页面所携带的路由bundle对象
+
+
+------------------------------------------------------------------------------------
+6.M6Core.Fetch({...})封装？参数？
+networkOpt: {processable: true, mock: 'SQJW_TEST_DYNAMIC_LIST'}
+    /** 网络请求 */
+    Fetch(config: {
+        url: string;
+        method?: string,
+        params?: {};
+        networkOpt?: {
+            timeout?: number,
+            processable?: boolean,
+            mock?: boolean,
+            headers?: {}, // 自定义请求头
+            responseType?: string, // 服务器响应的数据类型，可以是 'arraybuffer', 'blob', 'document', 'json', 'text', 'stream'
+            onUploadProgress: (progressEvent: any) => void, // 上传处理进度事件
+            onDownloadProgress: (progressEvent: any) => void, // 下载处理进度事件
+        };
+        callback?: (entity: {
+            flag: number, // 服务器响应状态 链路异常-1，网络异常0，网络正常1
+            result: {}, // 服务器提供的响应
+            response: {}, // 服务器响应
+            error: any,
+        }) => void;
+    }): void;
+
+
+------------------------------------------------------------------------------------
+
+
+7.mson文件
+mson---高性能的JSON序列化工具MSON:https://cloud.tencent.com/developer/article/1058536
+
+------------------------------------------------------------------------------------
+
+
+8.M6Core.Components vs M6Core.Controller
+9.didMount 只在controller中？
+8&9:
+    class View {
+        constructor(props?: any, Controller?: Controller, config?: any);
+        planToWillMount(): void; // 页面即将初始化
+        planToDidMount(): void; // 页面初始化完成，可安全访问数据状态对象
+        planToWillUnmount(): void; // 页面即将卸载
+        getViewData(): {}; // 获取表单数据状态
+        setViewData(data: {}, callback: (viewData: {}) => void): void; // 设置表单数据状态
+        getViewStyle(): {}; // 获取页面数据状态
+        setViewStyle(viewStyle: {}, callback: (viewStyle: {}) => void, refresh?: boolean): void; // 设置页面数据状态
+        historyAction(): string; // 获取当前页面在history栈中状态
+        getUrl(withoutPrefixSymbol?: boolean): string; // 获取当前页面url路径
+        getBundle(url?: string, native?: boolean): {}; // 获取页面传递数据对象
+        setBundle(url?: string, bundle?: {}, callback?: () => void): void; // 设置页面传递数据对象
+        go(url: string, state: {}, outer: boolean): void; // 路由前进
+        goBack(state?: {}): void; // 路由返回
+        getController(): Controller; // 获取当前页面注册的控制器
+        regDef(name: string): object; // 钩子对象
+    }
+
+    class Controller {
+        constructor(context: View);
+        toBind(methods?: object): void;
+        didMount(): void;
+        willUnmount(): void;
+        setContext(context: View): void;
+        getContext(): View;
+        go(url: string, state: {}, outer: boolean): void;
+        goBack(state?: {}): void;
+    }
+
+
+------------------------------------------------------------------------------------
+
+
+
+10.this.getContext().defRefs['myList'].getData().length
+   this.getContext().defRefs['content'].add(content);
+defRefs['myList'] ？？
+getData() 方法----------> 获取弹窗数据
+setData() 方法----------> 设置弹窗数据
+add() ?
+------------------------------------------------------------------------------------
+11.ref={this.regDef('fans')}
+regDef与defRefs['myList']的区别----->regDef(name: string): object; // 钩子对象
+
+    /* 注册钩子函数，默认以当前组件name为id标识 */
+    regDef(name = this.props.name) {
+        if(name && !this.defRefs.__handle[name])
+            this.defRefs.__handle[name] = c => this.defRefs[name] = c;
+        return this.defRefs.__handle[name];
+    }
+
+
+------------------------------------------------------------------------------------
+12.Object.assign(this.props.tabState, this.getBundle().state);
+Object.assign(目标对象， 源对象) 方法用于将所有可枚举属性的值从一个或多个源对象复制到目标对象。它将返回目标对象。
+
+   this.refresh();??
+
+------------------------>
+ let sysCfg = window.M6.getSysConfig();
+        sysCfg = Object.assign(this.getDefConfig(), sysCfg);
+        this.setViewData(sysCfg);
+
+window.M6？全局方法？
+
+------------------------------------------------------------------------------------
+
+13.单位标准rem，如何配置?
+m6-->html fontSize = 20?
+
+window.M6.setFontSize--->不是动态设置？ 切换设备如何自适应？
+
+------------------------------------------------------------------------------------
+14.Root host={this} ？
+------------------------------------------------------------------------------------
+15.地图的使用
+------------------------------------------------------------------------------------
+16.go--路由前进，goBack--路由后退
+
+------------------------------------------------------------------------------------
+
+17.Icon组件 如何知道名字（arrow-right） 修改样式（颜色）
